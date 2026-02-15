@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CloudStick - Server Launcher
+42Drive - Server Launcher
 Builds and starts the Next.js production server, displaying the local URL.
 """
 
@@ -31,12 +31,12 @@ class C:
 def banner():
     print(f"""
 {C.CYAN}{C.BOLD}
-   ██████╗██╗      ██████╗ ██╗   ██╗██████╗ ███████╗████████╗██╗ ██████╗██╗  ██╗
-  ██╔════╝██║     ██╔═══██╗██║   ██║██╔══██╗██╔════╝╚══██╔══╝██║██╔════╝██║ ██╔╝
-  ██║     ██║     ██║   ██║██║   ██║██║  ██║███████╗   ██║   ██║██║     █████╔╝
-  ██║     ██║     ██║   ██║██║   ██║██║  ██║╚════██║   ██║   ██║██║     ██╔═██╗
-  ╚██████╗███████╗╚██████╔╝╚██████╔╝██████╔╝███████║   ██║   ██║╚██████╗██║  ██╗
-   ╚═════╝╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝ ╚═════╝╚═╝  ╚═╝
+  ██╗  ██╗██████╗ ██████╗ ██████╗ ██╗██╗   ██╗███████╗
+  ██║  ██║╚════██╗██╔══██╗██╔══██╗██║██║   ██║██╔════╝
+  ███████║ █████╔╝██║  ██║██████╔╝██║██║   ██║█████╗
+  ╚════██║██╔═══╝ ██║  ██║██╔══██╗██║╚██╗ ██╔╝██╔══╝
+       ██║███████╗██████╔╝██║  ██║██║ ╚████╔╝ ███████╗
+       ╚═╝╚══════╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝
 {C.RESET}
 {C.DIM}  Personal Cloud Storage — Powered by Azure{C.RESET}
 """)
@@ -88,7 +88,7 @@ def start_server():
 
     print(f"""
 {C.BOLD}{'─' * 56}{C.RESET}
-{C.GREEN}{C.BOLD}  ✔  CloudStick is ready!{C.RESET}
+{C.GREEN}{C.BOLD}  ✔  42Drive is ready!{C.RESET}
 
   {C.BOLD}Local:{C.RESET}     {C.CYAN}http://localhost:{PORT}{C.RESET}
   {C.BOLD}Network:{C.RESET}   {C.CYAN}http://{local_ip}:{PORT}{C.RESET}
@@ -110,7 +110,7 @@ def start_server():
         )
 
         def handle_signal(sig, frame):
-            print(f"\n{C.YELLOW}⏹  Shutting down CloudStick...{C.RESET}")
+            print(f"\n{C.YELLOW}⏹  Shutting down 42Drive...{C.RESET}")
             process.terminate()
             process.wait(timeout=10)
             print(f"{C.GREEN}✔  Server stopped.{C.RESET}")

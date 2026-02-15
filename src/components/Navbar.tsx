@@ -29,7 +29,7 @@ export default function Navbar() {
             </div>
             <div>
               <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                CloudStick
+                42Drive
               </h1>
               <p className="text-[10px] text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wider uppercase">
                 Personal Cloud

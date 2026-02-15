@@ -3,7 +3,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "CloudStick - Your Personal Cloud Storage",
+  title: "42Drive - Your Personal Cloud Storage",
   description:
     "Upload, organize, and access your files from anywhere. Secure cloud storage for your family.",
   icons: {

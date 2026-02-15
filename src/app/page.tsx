@@ -74,7 +74,7 @@ export default function Home() {
                 <FiCloud className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                CloudStick
+                42Drive
               </h1>
             </motion.div>
             <motion.div
@@ -207,7 +207,7 @@ export default function Home() {
       <footer className="relative z-10 border-t border-gray-100 dark:border-gray-800/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
           <p className="text-center text-sm text-gray-400 dark:text-gray-500">
-            &copy; 2026 CloudStick. Built with love for the family.
+            &copy; 2026 42Drive. Built with love for the family.
           </p>
         </div>
       </footer>

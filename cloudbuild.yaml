@@ -1,4 +1,4 @@
-# Google Cloud Build configuration for CloudStick
+# Google Cloud Build configuration for 42Drive
 # Triggers: Pushes to the 'main' branch on GitHub
 # Deploys to: Google Cloud Run
 #
@@ -10,7 +10,7 @@
 #      gcloud artifacts repositories create cloudstick \
 #        --repository-format=docker \
 #        --location=us-central1 \
-#        --description="CloudStick container images"
+#        --description="42Drive container images"
 #
 # 3. Grant Cloud Build permission to deploy to Cloud Run:
 #      PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
@@ -29,7 +29,8 @@
 #
 # 5. Set environment variables as substitutions in the trigger:
 #      _NEXTAUTH_URL, _NEXTAUTH_SECRET, _GOOGLE_CLIENT_ID, _GOOGLE_CLIENT_SECRET,
-#      _AZURE_STORAGE_CONNECTION_STRING, _AZURE_STORAGE_ACCOUNT_NAME, _AZURE_STORAGE_CONTAINER_NAME
+#      _AZURE_STORAGE_CONNECTION_STRING, _AZURE_STORAGE_ACCOUNT_NAME, _AZURE_STORAGE_CONTAINER_NAME,
+#      _GEMINI_API_KEY
 # ──────────────────────────────────────────────────────────────────────────────
 
 substitutions:
@@ -80,7 +81,7 @@ steps:
       - "--max-instances"
       - "3"
       - "--set-env-vars"
-      - "NEXTAUTH_URL=${_NEXTAUTH_URL},NEXTAUTH_SECRET=${_NEXTAUTH_SECRET},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},AZURE_STORAGE_CONNECTION_STRING=${_AZURE_STORAGE_CONNECTION_STRING},AZURE_STORAGE_ACCOUNT_NAME=${_AZURE_STORAGE_ACCOUNT_NAME},AZURE_STORAGE_CONTAINER_NAME=${_AZURE_STORAGE_CONTAINER_NAME}"
+      - "NEXTAUTH_URL=${_NEXTAUTH_URL},NEXTAUTH_SECRET=${_NEXTAUTH_SECRET},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},AZURE_STORAGE_CONNECTION_STRING=${_AZURE_STORAGE_CONNECTION_STRING},AZURE_STORAGE_ACCOUNT_NAME=${_AZURE_STORAGE_ACCOUNT_NAME},AZURE_STORAGE_CONTAINER_NAME=${_AZURE_STORAGE_CONTAINER_NAME},GEMINI_API_KEY=${_GEMINI_API_KEY}"
 
 images:
   - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"

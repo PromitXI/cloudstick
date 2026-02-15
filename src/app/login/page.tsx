@@ -82,7 +82,7 @@ export default function LoginPage() {
               transition={{ delay: 0.3 }}
               className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
             >
-              CloudStick
+              42Drive
             </motion.h1>
             <motion.p
               initial={{ y: 10, opacity: 0 }}

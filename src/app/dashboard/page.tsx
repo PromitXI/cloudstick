@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { FiCloud } from "react-icons/fi";
 import Navbar from "@/components/Navbar";
 import FileExplorer from "@/components/FileExplorer";
+import ChatPanel from "@/components/ChatPanel";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -61,6 +62,7 @@ export default function DashboardPage() {
         </motion.div>
         <FileExplorer />
       </main>
+      <ChatPanel />
     </div>
   );
 }
