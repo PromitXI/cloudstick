@@ -5,9 +5,9 @@ import Providers from "@/components/Providers";
 export const metadata: Metadata = {
   title: "42Drive - Your Personal Cloud Storage",
   description:
-    "Upload, organize, and access your files from anywhere. Secure cloud storage for your family.",
+    "Safe, Secure, Free, Cloud Storage for All.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/brand-icon.svg",
   },
 };
 
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="font-sans antialiased bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100"
+        className="font-sans antialiased bg-[#111113] text-[#ececec]"
       >
         <Providers>{children}</Providers>
       </body>

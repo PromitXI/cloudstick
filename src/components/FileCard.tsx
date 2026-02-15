@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { FiDownload, FiTrash2 } from "react-icons/fi";
@@ -12,12 +12,7 @@ interface FileCardProps {
   index: number;
 }
 
-export default function FileCard({
-  file,
-  onDownload,
-  onDelete,
-  index,
-}: FileCardProps) {
+export default function FileCard({ file, onDownload, onDelete, index }: FileCardProps) {
   const icon = getFileIcon(file.contentType, file.name);
   const colorClass = getFileColor(file.contentType);
 
@@ -26,49 +21,44 @@ export default function FileCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{
-        delay: index * 0.05,
-        type: "spring",
-        stiffness: 300,
-        damping: 25,
-      }}
+      transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 25 }}
       whileHover={{ y: -2, scale: 1.01 }}
-      className="group relative rounded-2xl bg-white dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700/50 p-4 hover:shadow-lg hover:shadow-gray-100/50 dark:hover:shadow-gray-900/30 transition-shadow duration-300"
+      className="group relative rounded-2xl border border-[#d6d1c6] bg-[#f8f6ef] p-4 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/10"
     >
       <div className="flex items-center gap-3">
         <div
-          className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-lg shadow-gray-200/50 dark:shadow-gray-900/30`}
+          className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${colorClass} shadow-md`}
         >
           <span className="text-xl">{icon}</span>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
-            {file.name}
-          </p>
-          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-[#282620]">{file.name}</p>
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
             <span>{formatFileSize(file.size)}</span>
-            <span>•</span>
+            <span>/</span>
             <span>{formatDate(file.lastModified)}</span>
           </div>
         </div>
+
         <div className="flex items-center gap-1">
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => onDownload(file.path, file.name)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 text-gray-400 hover:text-blue-500"
+            className="rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[#f6efe3] hover:text-orange-600"
             title="Download"
           >
-            <FiDownload className="w-4 h-4" />
+            <FiDownload className="h-4 w-4" />
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => onDelete(file.path, "file")}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-500"
+            className="rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-100 hover:text-red-600"
             title="Delete"
           >
-            <FiTrash2 className="w-4 h-4" />
+            <FiTrash2 className="h-4 w-4" />
           </motion.button>
         </div>
       </div>

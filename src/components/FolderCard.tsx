@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { FiFolder, FiTrash2, FiChevronRight } from "react-icons/fi";
@@ -11,12 +11,7 @@ interface FolderCardProps {
   index: number;
 }
 
-export default function FolderCard({
-  folder,
-  onNavigate,
-  onDelete,
-  index,
-}: FolderCardProps) {
+export default function FolderCard({ folder, onNavigate, onDelete, index }: FolderCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -26,18 +21,18 @@ export default function FolderCard({
       whileHover={{ y: -2, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onNavigate(folder.path)}
-      className="group relative cursor-pointer rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-100 dark:border-amber-900/30 p-4 hover:shadow-lg hover:shadow-amber-100/50 dark:hover:shadow-amber-900/20 transition-shadow duration-300"
+      className="group relative cursor-pointer rounded-2xl border border-[#d6d1c6] bg-[#f8f3e8] p-4 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/10"
     >
       <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200/50 dark:shadow-amber-900/30">
-          <FiFolder className="w-6 h-6 text-white" />
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 shadow-md">
+          <FiFolder className="h-6 w-6 text-white" />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
-            {folder.name}
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">Folder</p>
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-[#282620]">{folder.name}</p>
+          <p className="text-xs text-zinc-500">Folder</p>
         </div>
+
         <div className="flex items-center gap-1">
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -46,11 +41,11 @@ export default function FolderCard({
               e.stopPropagation();
               onDelete(folder.path, "folder");
             }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-400 hover:text-red-500"
+            className="rounded-lg p-2 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-100 hover:text-red-600"
           >
-            <FiTrash2 className="w-4 h-4" />
+            <FiTrash2 className="h-4 w-4" />
           </motion.button>
-          <FiChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-amber-500 transition-colors" />
+          <FiChevronRight className="h-4 w-4 text-zinc-400 transition-colors group-hover:text-orange-500" />
         </div>
       </div>
     </motion.div>

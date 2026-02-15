@@ -1,53 +1,42 @@
-"use client";
+﻿"use client";
 
 import { signOut, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { FiLogOut, FiCloud, FiUser } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import Image from "next/image";
+import BrandIcon from "@/components/BrandIcon";
 
 export default function Navbar() {
   const { data: session } = useSession();
 
   return (
     <motion.nav
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800"
+      className="sticky top-0 z-40 border-b border-[#d6d1c6] bg-[#ececec]/95 backdrop-blur"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="flex items-center gap-3"
-          >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="flex h-16 items-center justify-between">
+          <motion.div whileHover={{ scale: 1.01 }} className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-200/50 dark:shadow-blue-900/30">
-                <FiCloud className="w-5 h-5 text-white" />
+              <div className="grid h-10 w-10 place-items-center rounded-xl border border-[#d6d1c6] bg-[#f8f6ef] shadow-md">
+                <BrandIcon size={20} />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-900" />
+              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#ececec] bg-orange-500" />
             </div>
             <div>
-              <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                42Drive
-              </h1>
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wider uppercase">
-                Personal Cloud
-              </p>
+              <h1 className="text-lg font-black tracking-tight text-[#181714]">42Drive</h1>
+              <p className="-mt-0.5 text-[10px] uppercase tracking-[0.15em] text-zinc-500">Personal Cloud</p>
             </div>
           </motion.div>
 
-          {/* User Info */}
           {session?.user && (
             <div className="flex items-center gap-3">
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {session.user.name}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">
-                  {session.user.email}
-                </span>
+              <div className="hidden flex-col items-end sm:flex">
+                <span className="text-sm font-semibold text-[#2a2823]">{session.user.name}</span>
+                <span className="text-xs text-zinc-500">{session.user.email}</span>
               </div>
+
               <div className="relative">
                 {session.user.image ? (
                   <Image
@@ -55,22 +44,23 @@ export default function Navbar() {
                     alt={session.user.name || "User"}
                     width={36}
                     height={36}
-                    className="rounded-xl border-2 border-gray-100 dark:border-gray-700"
+                    className="rounded-xl border border-[#d4cec2]"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
-                    <FiUser className="w-4 h-4 text-white" />
+                  <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#d6d1c6]">
+                    <FiUser className="h-4 w-4 text-[#3a3832]" />
                   </div>
                 )}
               </div>
+
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition-colors"
+                className="rounded-xl p-2 text-zinc-500 transition hover:bg-[#f6efe3] hover:text-orange-600"
                 title="Sign out"
               >
-                <FiLogOut className="w-4 h-4" />
+                <FiLogOut className="h-4 w-4" />
               </motion.button>
             </div>
           )}

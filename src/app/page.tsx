@@ -1,15 +1,18 @@
-"use client";
+﻿"use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { FiCloud, FiShield, FiUploadCloud, FiFolder, FiArrowRight } from "react-icons/fi";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { motion, AnimatePresence } from "framer-motion";
+import BrandIcon from "@/components/BrandIcon";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  const [showAbout, setShowAbout] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -19,198 +22,155 @@ export default function Home() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#0f0f10]">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+          transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
+          className="grid h-12 w-12 place-items-center rounded-xl border border-[#d6d1c6] bg-[#f8f6ef]"
         >
-          <FiCloud className="w-12 h-12 text-blue-500" />
+          <BrandIcon size={24} />
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-blue-950/20 dark:to-indigo-950/20" />
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-          className="absolute top-20 -left-32 w-96 h-96 bg-blue-200/40 dark:bg-blue-800/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
-          className="absolute bottom-20 -right-32 w-96 h-96 bg-purple-200/40 dark:bg-purple-800/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-200/30 dark:bg-indigo-800/10 rounded-full blur-3xl"
-        />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex items-center justify-between">
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-200/50">
-                <FiCloud className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                42Drive
-              </h1>
-            </motion.div>
-            <motion.div
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-            >
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium shadow-lg shadow-blue-200/50 hover:shadow-xl transition-shadow"
-              >
-                Sign In
-                <FiArrowRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
-          </div>
+    <div className="min-h-screen bg-[#111113] p-2 sm:p-3">
+      <div className="relative flex min-h-[calc(100vh-1rem)] flex-col overflow-hidden rounded-[20px] border border-zinc-700/40 bg-[#ececec] shadow-[0_40px_120px_rgba(0,0,0,0.35)] sm:min-h-[calc(100vh-1.5rem)]">
+        <div className="pointer-events-none absolute inset-0 opacity-50">
+          <div
+            className="h-full w-full"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(24,24,27,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(24,24,27,0.07) 1px, transparent 1px)",
+              backgroundSize: "110px 110px",
+            }}
+          />
         </div>
-      </header>
 
-      {/* Hero */}
-      <main className="relative z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-32">
-          <div className="text-center max-w-3xl mx-auto">
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium mb-8">
-                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                Secure & Private Cloud Storage
-              </span>
-            </motion.div>
-
-            <motion.h2
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6"
-            >
-              Your files,{" "}
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                always within reach
-              </span>
-            </motion.h2>
-
-            <motion.p
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-lg text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto"
-            >
-              Upload, organize, and access your files from anywhere. Your
-              personal cloud storage that&apos;s simple, secure, and beautiful.
-            </motion.p>
-
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white font-semibold text-lg shadow-2xl shadow-blue-300/30 hover:shadow-blue-300/50 transition-shadow"
-              >
-                Get Started Free
-                <FiArrowRight className="w-5 h-5" />
-              </Link>
-            </motion.div>
+        <header className="relative z-10 flex items-start justify-between gap-4 px-4 pb-2 pt-5 sm:px-6 sm:pt-6">
+          <div className="flex items-start gap-2">
+            <BrandIcon size={22} />
+            <div>
+              <p className="text-[12px] font-semibold tracking-tight text-zinc-700">42 Drive</p>
+              <div className="mt-1 h-[2px] w-14 bg-zinc-700/40" />
+            </div>
           </div>
 
-          {/* Features */}
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24"
-          >
-            {[
-              {
-                icon: FiUploadCloud,
-                title: "Drag & Drop Upload",
-                description:
-                  "Simply drag your files and watch them upload with beautiful animations.",
-                gradient: "from-blue-500 to-cyan-500",
-                shadowColor: "shadow-blue-200/50",
-              },
-              {
-                icon: FiFolder,
-                title: "Organize with Folders",
-                description:
-                  "Create folders and organize your files just like on your computer.",
-                gradient: "from-amber-500 to-orange-500",
-                shadowColor: "shadow-amber-200/50",
-              },
-              {
-                icon: FiShield,
-                title: "Private & Secure",
-                description:
-                  "Your files are encrypted and only accessible by you. No one else can see them.",
-                gradient: "from-green-500 to-emerald-500",
-                shadowColor: "shadow-green-200/50",
-              },
-            ].map((feature, i) => (
+          <div className="flex flex-col items-end gap-3">
+            <nav className="flex items-center gap-3 text-[13px] font-semibold text-zinc-700 sm:gap-6 sm:text-[15px]">
+              <button
+                type="button"
+                className="transition hover:text-zinc-900"
+                onClick={() => setShowAbout((prev) => !prev)}
+              >
+                About
+              </button>
+              <span className="cursor-default">Safe</span>
+              <span className="cursor-default">Cloud storage</span>
+              <button
+                type="button"
+                className="relative transition hover:text-zinc-900"
+                onClick={() => setShowContact(true)}
+              >
+                Get in touch
+                <span className="absolute -right-2 -top-2 h-1.5 w-6 rotate-[-28deg] bg-orange-500" />
+              </button>
+            </nav>
+
+            <Link
+              href="/login"
+              className="rounded-lg border border-zinc-900 px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.09em] text-zinc-900 transition hover:bg-zinc-900 hover:text-white"
+            >
+              Enter
+            </Link>
+          </div>
+        </header>
+
+        <AnimatePresence>
+          {showAbout && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="relative z-10 mx-4 mt-1 rounded-xl border border-zinc-300 bg-white/75 px-4 py-3 backdrop-blur sm:mx-6"
+            >
+              <p className="text-sm font-medium text-zinc-700 sm:text-base">
+                Our motto: Safe, Secure, Free, Cloud Storage for All.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <main className="relative z-10 flex flex-1 items-end px-2 pb-6 sm:px-4 sm:pb-8 md:px-6 md:pb-10">
+          <div className="w-full">
+            <h1 className="select-none whitespace-nowrap text-[24vw] font-black leading-[0.82] tracking-[-0.06em] text-[#101115] sm:text-[21vw] md:text-[20vw] lg:text-[18vw] xl:text-[16.5vw]">
+              42Dr
+              <span className="relative ml-[0.03em] inline-block">
+                i
+                <span className="absolute left-[0.02em] right-[0.02em] top-[-0.16em] h-[0.07em] bg-orange-500" />
+              </span>
+              ve
+            </h1>
+          </div>
+        </main>
+
+        <AnimatePresence>
+          {showContact && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-30 grid place-items-center bg-black/35 px-4"
+              onClick={() => setShowContact(false)}
+            >
               <motion.div
-                key={feature.title}
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 + i * 0.1 }}
-                whileHover={{ y: -5 }}
-                className="p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-100 dark:border-gray-700/50 hover:shadow-xl transition-shadow"
+                initial={{ y: 18, opacity: 0, scale: 0.97 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: 12, opacity: 0, scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                onClick={(event) => event.stopPropagation()}
+                className="w-full max-w-md rounded-[2px] border border-[#ddd7cb] bg-[#f8f6ef] p-7 text-[#22211f] shadow-[0_30px_70px_rgba(0,0,0,0.32)]"
               >
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg ${feature.shadowColor} dark:shadow-none mb-4`}
-                >
-                  <feature.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </main>
+                <div className="rounded-[1px] border border-[#ece7dc] bg-[#fbfaf5] px-5 py-4">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.34em] text-[#8e8576]">
+                    42 Drive
+                  </p>
+                  <h2 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[0.07em] text-[#2a2824]">
+                    PROMIT BHATTACHERJEE
+                  </h2>
+                  <p className="mt-1 text-[11px] uppercase tracking-[0.24em] text-[#8a8071]">
+                    Cloud Infrastructure
+                  </p>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-gray-100 dark:border-gray-800/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <p className="text-center text-sm text-gray-400 dark:text-gray-500">
-            &copy; 2026 42Drive. Built with love for the family.
-          </p>
-        </div>
-      </footer>
+                  <div className="my-4 border-t border-dashed border-[#cfc5b3]" />
+
+                  <div className="space-y-1.5 text-[13px] tracking-[0.04em] text-[#47423a]">
+                    <p>promit.xi@gmail.com</p>
+                    <p>+91-9742757917</p>
+                    <a
+                      href="https://x.com/PromitXi"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block border-b border-[#6f675a] leading-tight hover:text-black"
+                    >
+                      x.com/PromitXi
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowContact(false)}
+                  className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#7e7568] transition hover:text-black"
+                >
+                  Close
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
