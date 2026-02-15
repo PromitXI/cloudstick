@@ -102,15 +102,20 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        <main className="relative z-10 flex flex-1 items-end px-2 pb-6 sm:px-4 sm:pb-8 md:px-6 md:pb-10">
+        <main className="relative z-10 flex flex-1 items-center px-2 pb-6 pt-2 sm:px-4 sm:pb-8 md:px-6 md:pb-10 lg:items-end lg:pt-0">
           <div className="w-full">
-            <h1 className="select-none whitespace-nowrap text-[24vw] font-black leading-[0.82] tracking-[-0.06em] text-[#101115] sm:text-[21vw] md:text-[20vw] lg:text-[18vw] xl:text-[16.5vw]">
-              42Dr
-              <span className="relative ml-[0.03em] inline-block">
-                i
-                <span className="absolute left-[0.02em] right-[0.02em] top-[-0.16em] h-[0.07em] bg-orange-500" />
+            <h1 className="select-none text-center font-black leading-[0.86] tracking-[-0.06em] text-[#101115] sm:text-left lg:whitespace-nowrap lg:text-[19vw] xl:text-[17.5vw]">
+              <span className="block text-[38vw] sm:text-[32vw] md:text-[28vw] lg:inline lg:text-inherit">
+                42
               </span>
-              ve
+              <span className="block text-[32vw] sm:text-[28vw] md:text-[24vw] lg:ml-0 lg:inline lg:text-inherit">
+                Dr
+                <span className="relative ml-[0.025em] inline-block">
+                  i
+                  <span className="absolute left-[0.02em] right-[0.02em] top-[-0.16em] h-[0.07em] bg-orange-500" />
+                </span>
+                ve
+              </span>
             </h1>
           </div>
         </main>

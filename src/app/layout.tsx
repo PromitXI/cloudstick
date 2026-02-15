@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Safe, Secure, Free, Cloud Storage for All.",
   icons: {
-    icon: "/brand-icon.svg",
+    icon: "/favicon.jpg",
   },
 };
 

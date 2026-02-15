@@ -13,12 +13,12 @@ export default function BrandIcon({
 }: BrandIconProps) {
   return (
     <Image
-      src="/brand-icon.svg"
+      src="/landing-page-icon.jpg"
       alt="42Drive icon"
       width={size}
       height={size}
       priority={priority}
-      className={className}
+      className={`object-cover ${className}`}
     />
   );
 }
