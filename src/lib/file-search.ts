@@ -143,28 +143,46 @@ export async function searchFiles(
     if (filters.keywords && filters.keywords.length > 0) {
       const nameLower = file.name.toLowerCase();
       const pathLower = file.path.toLowerCase();
+      // Strip extension for cleaner name matching
+      const nameNoExt = nameLower.replace(/\.[^.]+$/, "");
+      // Split filename into individual tokens (split on spaces, dashes, underscores, dots, camelCase)
+      const nameTokens = nameNoExt
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .split(/[\s_\-.\/]+/)
+        .filter((t) => t.length > 0);
+      let keywordHits = 0;
 
       for (const kw of filters.keywords) {
         const kwLower = kw.toLowerCase();
 
-        // Exact substring match in name
+        // Exact substring match in name (highest signal)
         if (nameLower.includes(kwLower)) {
           score += 0.4;
+          keywordHits++;
           reasons.push(`Name contains "${kw}"`);
+        }
+        // Token-level match (e.g. "HLD" matches "project-HLD-v2.docx")
+        else if (nameTokens.some((t) => t === kwLower || t.includes(kwLower) || kwLower.includes(t))) {
+          score += 0.35;
+          keywordHits++;
+          reasons.push(`Name token matches "${kw}"`);
         }
         // Path match
         else if (pathLower.includes(kwLower)) {
           score += 0.25;
+          keywordHits++;
           reasons.push(`Path contains "${kw}"`);
         }
         // Category match (e.g. "document", "image", "video")
         else if (category === kwLower || category.includes(kwLower)) {
           score += 0.3;
+          keywordHits++;
           reasons.push(`File type is ${category}`);
         }
         // Extension match
         else if (ext === kwLower) {
           score += 0.35;
+          keywordHits++;
           reasons.push(`Extension is .${ext}`);
         }
         // Fuzzy match
@@ -172,9 +190,15 @@ export async function searchFiles(
           const fs = fuzzyScore(nameLower, kwLower);
           if (fs > 0.3) {
             score += fs * 0.3;
+            keywordHits++;
             reasons.push(`Similar to "${kw}" (${Math.round(fs * 100)}%)`);
           }
         }
+      }
+
+      // Bonus for matching multiple keywords
+      if (keywordHits > 1) {
+        score += 0.1 * (keywordHits - 1);
       }
     }
 

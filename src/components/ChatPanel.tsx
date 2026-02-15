@@ -40,7 +40,7 @@ export default function ChatPanel() {
       id: "welcome",
       role: "assistant",
       content:
-        'Hi! I am your 42Drive file assistant. Ask me to find files, for example: "find my PDFs" or "show recent images".',
+        'Hi! I\'m your 42Drive file assistant. I can find your files, and even answer questions about what\'s inside your documents. Try "find my PDFs" or "What does the HLD say about the architecture?"',
       timestamp: new Date(),
     },
   ]);
@@ -265,7 +265,7 @@ export default function ChatPanel() {
             {messages.length === 1 && (
               <div className="px-4 pb-2">
                 <div className="flex flex-wrap gap-1.5">
-                  {["Show recent files", "Find PDFs", "Large files", "Images this week"].map((q) => (
+                  {["Show recent files", "Find my HLD docs", "What's in my report?", "Large files"].map((q) => (
                     <button
                       key={q}
                       onClick={() => sendQuery(q)}

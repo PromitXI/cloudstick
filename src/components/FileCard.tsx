@@ -1,9 +1,10 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { FiDownload, FiTrash2 } from "react-icons/fi";
+import { FiDownload, FiTrash2, FiMove } from "react-icons/fi";
 import { FileItem } from "@/lib/azure-storage";
 import { formatFileSize, formatDate, getFileIcon, getFileColor } from "@/lib/utils";
+import React from "react";
 
 interface FileCardProps {
   file: FileItem;
@@ -16,15 +17,25 @@ export default function FileCard({ file, onDownload, onDelete, index }: FileCard
   const icon = getFileIcon(file.contentType, file.name);
   const colorClass = getFileColor(file.contentType);
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("application/42drive-file", JSON.stringify({ path: file.path, name: file.name }));
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 25 }}
-      whileHover={{ y: -2, scale: 1.01 }}
-      className="group relative rounded-2xl border border-[#d6d1c6] bg-[#f8f6ef] p-4 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/10"
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      className="cursor-grab active:cursor-grabbing"
     >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 25 }}
+        whileHover={{ y: -2, scale: 1.01 }}
+        className="group relative rounded-2xl border border-[#d6d1c6] bg-[#f8f6ef] p-4 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/10"
+      >
       <div className="flex items-center gap-3">
         <div
           className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${colorClass} shadow-md`}
@@ -42,6 +53,7 @@ export default function FileCard({ file, onDownload, onDelete, index }: FileCard
         </div>
 
         <div className="flex items-center gap-1">
+          <FiMove className="h-3.5 w-3.5 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-60" title="Drag to move" />
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -63,5 +75,6 @@ export default function FileCard({ file, onDownload, onDelete, index }: FileCard
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }

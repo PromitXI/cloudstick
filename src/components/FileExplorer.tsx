@@ -97,6 +97,23 @@ export default function FileExplorer() {
     }
   };
 
+  const handleMoveFile = async (filePath: string, destinationFolder: string) => {
+    try {
+      const response = await fetch("/api/files/move", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourcePath: filePath, destinationFolder }),
+      });
+      if (response.ok) {
+        fetchFiles();
+      } else {
+        console.error("Move failed");
+      }
+    } catch (error) {
+      console.error("Move failed:", error);
+    }
+  };
+
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) return;
 
@@ -314,6 +331,7 @@ export default function FileExplorer() {
                 folder={folder}
                 onNavigate={handleNavigate}
                 onDelete={handleDelete}
+                onFileDrop={handleMoveFile}
                 index={index}
               />
             ))}

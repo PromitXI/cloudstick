@@ -1,11 +1,12 @@
 /**
- * Gemini-powered intent parser and result summarizer.
+ * Gemini-powered intent parser, guardrails, and result summarizer.
  * 
  * Flow:
- *   1. User asks natural language query ("find invoices from last month")
- *   2. Gemini parses intent → structured SearchFilters
- *   3. file-search runs the filters against Azure metadata
- *   4. Gemini summarizes the results for the user
+ *   1. User asks natural language query
+ *   2. Guardrail check: is the query related to files/documents?
+ *   3. Classify: "file_search" (find files) vs "content_question" (ask about file contents)
+ *   4. For file_search: parse → search → summarize
+ *   5. For content_question: find relevant files → read contents → answer using Gemini
  * 
  * The Gemini API key lives server-side only (GEMINI_API_KEY env var).
  */
@@ -21,6 +22,90 @@ function getModel() {
   }
   const genAI = new GoogleGenerativeAI(geminiApiKey);
   return genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+}
+
+// ── Guardrails ───────────────────────────────────────────────────────────────
+
+const GUARDRAIL_PROMPT = `You are a strict guardrail for 42Drive, a personal cloud storage app.
+Your ONLY job is to decide if the user's message is related to their uploaded files and documents.
+
+ALLOWED topics (respond "ALLOWED"):
+- Finding, searching, listing files or folders
+- Asking about file details (size, date, type, location)
+- Asking questions ABOUT THE CONTENT of their uploaded documents (e.g. "What is the IP address in the HLD?", "Summarize my report", "What does the contract say about pricing?")
+- Managing files (move, organize, delete requests)
+- Storage usage questions
+- Anything referencing their documents, files, folders, uploads
+
+BLOCKED topics (respond "BLOCKED"):
+- Weather, news, sports, politics, entertainment
+- Flirting, personal conversation, jokes, riddles
+- General knowledge questions NOT about their documents (e.g. "What is the capital of France?")
+- Coding help, math problems, homework
+- Anything completely unrelated to their stored files
+
+Respond with EXACTLY one word: "ALLOWED" or "BLOCKED". Nothing else.`;
+
+export async function checkGuardrail(query: string): Promise<boolean> {
+  try {
+    const model = getModel();
+    const result = await model.generateContent([
+      { text: GUARDRAIL_PROMPT },
+      { text: `User message: "${query}"` },
+    ]);
+    const verdict = result.response.text().trim().toUpperCase();
+    return verdict.includes("ALLOWED");
+  } catch {
+    // If guardrail fails, default to allowing (don't block legitimate queries)
+    return true;
+  }
+}
+
+// ── Query classification ─────────────────────────────────────────────────────
+
+const CLASSIFY_PROMPT = `You classify user queries for 42Drive (cloud storage app) into exactly one category.
+
+"file_search" — The user wants to FIND or LIST files. Examples:
+- "Find my PDFs"
+- "Show recent images"  
+- "Is there any HLD file?"
+- "Do I have any spreadsheets?"
+
+"content_question" — The user wants to know something INSIDE a document's content. Examples:
+- "What is the IP address for Mazumo?"
+- "What does the HLD say about the architecture?"
+- "Summarize the project proposal"
+- "What are the key findings in the report?"
+- "Give me the server details from the documentation"
+
+Respond with ONLY valid JSON: {"type": "file_search" or "content_question", "searchKeywords": ["relevant", "keywords", "to", "find", "the", "file"]}
+The searchKeywords should help find the RELEVANT FILE(s) the user is asking about. Expand abbreviations.`;
+
+export interface QueryClassification {
+  type: "file_search" | "content_question";
+  searchKeywords: string[];
+}
+
+export async function classifyQuery(query: string): Promise<QueryClassification> {
+  try {
+    const model = getModel();
+    const result = await model.generateContent([
+      { text: CLASSIFY_PROMPT },
+      { text: `User query: "${query}"` },
+    ]);
+    const text = result.response.text().trim()
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+    const parsed = JSON.parse(text);
+    return {
+      type: parsed.type === "content_question" ? "content_question" : "file_search",
+      searchKeywords: parsed.searchKeywords || [],
+    };
+  } catch {
+    return { type: "file_search", searchKeywords: [] };
+  }
 }
 
 // ── Intent parsing ───────────────────────────────────────────────────────────
@@ -45,8 +130,20 @@ Today's date is: ${new Date().toISOString().split("T")[0]}
 
 Rules:
 - Always include relevant keywords extracted from the query.
+- CRITICAL: Expand ALL abbreviations and acronyms into their full forms AND keep the abbreviation as a keyword. Common examples:
+  - HLD → include ["HLD", "high", "level", "design", "documentation"]
+  - LLD → include ["LLD", "low", "level", "design"]
+  - SRS → include ["SRS", "software", "requirements", "specification"]
+  - BRD → include ["BRD", "business", "requirements", "document"]
+  - PRD → include ["PRD", "product", "requirements"]
+  - UAT → include ["UAT", "user", "acceptance", "testing"]
+  - API → include ["API", "interface"]
+  - SOW → include ["SOW", "statement", "work"]
+  - SLA → include ["SLA", "service", "level", "agreement"]
+  Apply this logic to ANY abbreviation, not just these examples.
+- When the user mentions concepts like "documentation", "design docs", "specs", include related keywords: ["doc", "documentation", "design", "spec", "HLD", "LLD", "SRS"].
 - If the user says "photos" or "pictures", set contentTypes to ["image"].
-- If the user says "documents", set contentTypes to ["document"].
+- If the user says "documents" or "documentation" or "files", set contentTypes to ["document"].
 - If the user says "videos", set contentTypes to ["video"].
 - "last month" means modifiedAfter = first day of previous month, modifiedBefore = first day of current month.
 - "last week" means modifiedAfter = 7 days ago.
@@ -154,6 +251,48 @@ Provide a brief, friendly summary of these results.`;
       return `I couldn't find any files matching "${query}". Try different keywords or check your folder names.`;
     }
     return `Found ${results.length} file${results.length > 1 ? "s" : ""} matching your search. The top result is "${results[0].name}".`;
+  }
+}
+
+// ── Document content Q&A ─────────────────────────────────────────────────────
+
+const CONTENT_QA_PROMPT = `You are 42Drive's document assistant. The user asked a question and we retrieved content from their uploaded documents.
+
+RULES:
+- Answer the user's question ONLY based on the document content provided below.
+- If the answer is found in the documents, give a clear, specific answer and mention which document it came from.
+- If the answer is NOT in the provided documents, say so honestly.
+- Be concise and direct. Do NOT use markdown formatting.
+- Do NOT make up information that isn't in the documents.
+- Use emoji sparingly (1-2 max).`;
+
+export async function answerFromDocuments(
+  query: string,
+  documentContents: { fileName: string; content: string }[]
+): Promise<string> {
+  try {
+    const model = getModel();
+
+    const docsText = documentContents
+      .map((d, i) => `--- Document ${i + 1}: "${d.fileName}" ---\n${d.content}\n`)
+      .join("\n");
+
+    const prompt = `User question: "${query}"
+
+Here are the contents of the user's relevant documents:
+
+${docsText}
+
+Answer the user's question based ONLY on the information in these documents.`;
+
+    const result = await model.generateContent([
+      { text: CONTENT_QA_PROMPT },
+      { text: prompt },
+    ]);
+    return result.response.text().trim();
+  } catch (error) {
+    console.error("Document Q&A failed:", error);
+    return "Sorry, I had trouble reading your documents. Please try again.";
   }
 }
 

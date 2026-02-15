@@ -219,6 +219,55 @@ export async function getStorageUsage(userId: string): Promise<number> {
   return totalSize;
 }
 
+/**
+ * Move / rename a file in Azure Blob Storage.
+ * (Azure has no native move — we copy then delete the source.)
+ */
+export async function moveFile(
+  userId: string,
+  sourcePath: string,
+  destinationPath: string
+): Promise<void> {
+  const container = await getContainerClient();
+  const srcBlob = `${getUserPrefix(userId)}${sourcePath}`;
+  const dstBlob = `${getUserPrefix(userId)}${destinationPath}`;
+
+  const srcClient = container.getBlockBlobClient(srcBlob);
+  const dstClient = container.getBlockBlobClient(dstBlob);
+
+  // Copy source → destination
+  const copyPoller = await dstClient.beginCopyFromURL(srcClient.url);
+  await copyPoller.pollUntilDone();
+
+  // Delete source
+  await srcClient.deleteIfExists();
+}
+
+/**
+ * Download a blob's raw content as a Buffer.
+ */
+export async function readBlobContent(
+  userId: string,
+  filePath: string
+): Promise<{ buffer: Buffer; contentType: string }> {
+  const container = await getContainerClient();
+  const blobName = `${getUserPrefix(userId)}${filePath}`;
+  const client = container.getBlockBlobClient(blobName);
+  const downloadResponse = await client.download(0);
+
+  const chunks: Buffer[] = [];
+  if (downloadResponse.readableStreamBody) {
+    for await (const chunk of downloadResponse.readableStreamBody) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+  }
+
+  return {
+    buffer: Buffer.concat(chunks),
+    contentType: downloadResponse.contentType || "application/octet-stream",
+  };
+}
+
 // Types
 export interface FileItem {
   name: string;

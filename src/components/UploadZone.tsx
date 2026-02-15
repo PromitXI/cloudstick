@@ -86,20 +86,20 @@ export default function UploadZone({ currentPath, onUploadComplete }: UploadZone
     [currentPath]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, noClick: false });
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({ onDrop, noClick: true });
 
   return (
     <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`relative cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ${
+        className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ${
           isDragActive
             ? "border-orange-400 bg-[#fdf4ea]"
-            : "border-[#d6d1c6] bg-[#f8f6ef] hover:border-orange-300"
+            : "border-[#d6d1c6] bg-[#f8f6ef]"
         }`}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center px-6 py-12">
+        <div className="flex flex-col items-center justify-center px-6 py-10">
           <motion.div
             animate={isDragActive ? { y: -8, scale: 1.08 } : { y: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -111,7 +111,17 @@ export default function UploadZone({ currentPath, onUploadComplete }: UploadZone
           <p className="mb-1 text-lg font-semibold text-[#2e2b25]">
             {isDragActive ? "Drop files here" : "Drag & drop files here"}
           </p>
-          <p className="text-sm text-zinc-500">or click to browse from your computer</p>
+          <p className="mb-4 text-sm text-zinc-500">or use the button below</p>
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={(e) => { e.stopPropagation(); open(); }}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-200/50 transition-shadow hover:shadow-lg hover:shadow-orange-300/50"
+          >
+            <FiUploadCloud className="h-4 w-4" />
+            Browse Files
+          </motion.button>
         </div>
 
         <AnimatePresence>
