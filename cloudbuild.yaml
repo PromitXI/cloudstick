@@ -1,0 +1,90 @@
+# Google Cloud Build configuration for CloudStick
+# Triggers: Pushes to the 'main' branch on GitHub
+# Deploys to: Google Cloud Run
+#
+# ── Prerequisites ─────────────────────────────────────────────────────────────
+# 1. Enable APIs:
+#      gcloud services enable cloudbuild.googleapis.com run.googleapis.com artifactregistry.googleapis.com
+#
+# 2. Create Artifact Registry repo (one-time):
+#      gcloud artifacts repositories create cloudstick \
+#        --repository-format=docker \
+#        --location=us-central1 \
+#        --description="CloudStick container images"
+#
+# 3. Grant Cloud Build permission to deploy to Cloud Run:
+#      PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+#      gcloud projects add-iam-policy-binding $PROJECT_ID \
+#        --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+#        --role="roles/run.admin"
+#      gcloud iam service-accounts add-iam-policy-binding \
+#        ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com \
+#        --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+#        --role="roles/iam.serviceAccountUser"
+#
+# 4. Connect GitHub repo to Cloud Build:
+#      - Go to https://console.cloud.google.com/cloud-build/triggers
+#      - Click "Connect Repository" → GitHub → select PromitXI/cloudstick
+#      - Create a trigger with this cloudbuild.yaml
+#
+# 5. Set environment variables as substitutions in the trigger:
+#      _NEXTAUTH_URL, _NEXTAUTH_SECRET, _GOOGLE_CLIENT_ID, _GOOGLE_CLIENT_SECRET,
+#      _AZURE_STORAGE_CONNECTION_STRING, _AZURE_STORAGE_ACCOUNT_NAME, _AZURE_STORAGE_CONTAINER_NAME
+# ──────────────────────────────────────────────────────────────────────────────
+
+substitutions:
+  _REGION: us-central1
+  _SERVICE_NAME: cloudstick
+  _REPO_NAME: cloudstick
+
+steps:
+  # Step 1: Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:latest"
+      - "."
+
+  # Step 2: Push images to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "--all-tags"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}"
+
+  # Step 3: Deploy to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "${_SERVICE_NAME}"
+      - "--image"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
+      - "--region"
+      - "${_REGION}"
+      - "--platform"
+      - "managed"
+      - "--port"
+      - "8080"
+      - "--allow-unauthenticated"
+      - "--memory"
+      - "512Mi"
+      - "--cpu"
+      - "1"
+      - "--min-instances"
+      - "0"
+      - "--max-instances"
+      - "3"
+      - "--set-env-vars"
+      - "NEXTAUTH_URL=${_NEXTAUTH_URL},NEXTAUTH_SECRET=${_NEXTAUTH_SECRET},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},AZURE_STORAGE_CONNECTION_STRING=${_AZURE_STORAGE_CONNECTION_STRING},AZURE_STORAGE_ACCOUNT_NAME=${_AZURE_STORAGE_ACCOUNT_NAME},AZURE_STORAGE_CONTAINER_NAME=${_AZURE_STORAGE_CONTAINER_NAME}"
+
+images:
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:latest"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
